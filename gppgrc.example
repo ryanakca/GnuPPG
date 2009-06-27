@@ -1,0 +1,33 @@
+[Default]
+# Path to the gpg executable
+#
+# Ex:
+# gpg_path = "/usr/bin/gpg"
+gpg_path = ""
+
+# Path the encrypted LUKS device.
+#
+# Ex:
+# encrypted_device = "/dev/mapper/lambda-gpg" 
+# or
+# encrypted_device = "/dev/sdg"
+encrypted_device = ""
+
+# Name for the decrypted LUKS device. When we decrypt the encrypted LUKS device,
+# we'll get /dev/mapper/decrypted_device
+#
+# Ex:
+# decrypted_device = "gpg-decrypted"
+decrypted_device = ""
+
+# Where should we mount the decrypted partition
+#
+# Ex:
+# mount_point = "/media/gpg"
+mount_point = ""
+
+# After how many minutes should we unmount the decrypted partition and close it?
+#
+# Ex:
+# unmount_time = "15"
+unmount_time = ""
