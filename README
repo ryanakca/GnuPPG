@@ -1,0 +1,10 @@
+First announced in http://blog.ryanak.ca/archives/planet-ubuntu/31 , these
+utilities will:
+ * Create a LUKS partition and copy your GnuPG homedir to it
+ * Provide a wrapper for gpg that will automatically mount the partition and
+   then, if the user wishes, automatically call the unmounter in X minutes.
+ * The unmounter unmounts your gpg directory and copies your pubring to the
+   mount target once the LUKS partition is unmounted. This permits you to do
+   thing which don't require your private key without having to mount the
+   encrypted partition
+ * The LUKS partition can be on a USB flashdrive, an LVM lv, etc.
