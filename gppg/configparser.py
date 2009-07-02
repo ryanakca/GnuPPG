@@ -17,19 +17,33 @@
 import ConfigParser
 import os
 
-class GppgHomedir:
+class GppgConfig(object):
+    """ This class represents the global config options used by GPPG. It
+    provides access to paths, etc. """
+
+    def __init__(self,
+            config_file=os.path.expanduser("~/.gppgrc")):
+        self.config = ConfigParser.SafeConfigParser()
+        self.config.read(config_file)
+        self.gpg_path = self.config.get("Global", "gpg_path", "/usr/bin/gpg")
+        self.at_path = self.config.get("Global", "at_path", "/usr/bin/at")
+        self.mount_path = self.config.get("Global", "mount_path", "/bin/mount")
+        self.unmount_time = self.config.get("Global", "unmount_time", 15)
+
+
+class GppgHomedir(GppgConfig):
     """ This class represents a LUKS encrypted device used by GPPG. It provides access to
     the device path, the mount point, the unmount time, etc.
     """
 
     def __init__(self, section="Default", 
             config_file=os.path.expanduser("~/.gppgrc")):
-        config = ConfigParser.SafeConfigParser()
-        config.read(config_file)
-        if config.has_option(section, "unmount_time"):
-            self.unmount_time = config.get(section, "unmount_time")
-        else:
-            self.unmount_time = config.get("Global", "unmount_time")
-        self.encrypted_device = config.get(section, "encrypted_device")
-        self.decrypted_device = config.get(section, "decrypted_device")
-        self.mount_point = config.get(section, "mount_point")
+        super(GppgHomedir, self).__init__(config_file=config_file)
+        # If the self.unmount_time line is unclear, what we're doing is checking
+        # if "unmount_time" was defined in 'section', if not, we'll check if it
+        # was defined in "Global", if not, we'll set it to our default.
+        self.unmount_time = self.config.get(section, "unmount_time",
+                self.config.get("Global", "unmount_time", self.unmount_time))
+        self.encrypted_device = self.config.get(section, "encrypted_device")
+        self.decrypted_device = self.config.get(section, "decrypted_device")
+        self.mount_point = self.config.get(section, "mount_point")
