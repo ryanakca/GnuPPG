@@ -1,54 +1,62 @@
 [Global]
-# Path to the 'gpg' executable
+# (Optional) Path to the 'gpg' executable
 #
-# Ex:
+# Default:
 # gpg_path = "/usr/bin/gpg"
-gpg_path = ""
-
-# Path to the 'at' executable
 #
-# Ex:
+# gpg_path = ""
+
+# (Optional) Path to the 'at' executable
+#
+# Default:
 # at_path = "/usr/bin/at"
-at_path = ""
-
-# Path to the 'mount' executable
 #
-# Ex:
+# at_path = ""
+
+# (Optional) Path to the 'mount' executable
+#
+# Default:
 # mount_path = "/bin/mount"
-mount_path = ""
-
-# After how many minutes should we unmount the decrypted partitions and close
-# them?
 #
-# Ex:
+# mount_path = ""
+
+# (Optional) After how many minutes should we unmount the decrypted partitions
+# and close them?
+#
+# Default:
 # unmount_time = "15"
-unmount_time = ""
+#
+# unmount_time = ""
 
 [Default]
-# Path the encrypted LUKS device.
+# (Required) Path the encrypted LUKS device.
 #
 # Ex:
 # encrypted_device = "/dev/mapper/lambda-gpg" 
 # or
 # encrypted_device = "/dev/sdg"
+#
 encrypted_device = ""
 
-# Name for the decrypted LUKS device. When we decrypt the encrypted LUKS device,
-# we'll get /dev/mapper/decrypted_device
+# (Optional) Name for the decrypted LUKS device. When we decrypt the encrypted
+# LUKS device, we'll get /dev/mapper/decrypted_device
 #
-# Ex:
+# Default:
 # decrypted_device = "gpg-decrypted"
-decrypted_device = ""
-
-# Where should we mount the decrypted partition
 #
-# Ex:
-# mount_point = "/media/gpg"
-mount_point = ""
+# decrypted_device = ""
 
-# After how many minutes should we unmount the decrypted partition and close it?
-# (Optional, will use the global option otherwise).
+# (Optional) Where should we mount the decrypted partition
 #
-# Ex:
-# unmount_time = "15"
-unmount_time = ""
+# Default:
+# mount_point = "/media/gppg"
+#
+# mount_point = ""
+
+# (Optional) After how many minutes should we unmount the decrypted partition
+# and close it?
+#
+# Default:
+# unmount_time = <Whatever was set in the Global section>
+#
+# unmount_time = ""
