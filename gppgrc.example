@@ -1,10 +1,30 @@
-[Default]
-# Path to the gpg executable
+[Global]
+# Path to the 'gpg' executable
 #
 # Ex:
 # gpg_path = "/usr/bin/gpg"
 gpg_path = ""
 
+# Path to the 'at' executable
+#
+# Ex:
+# at_path = "/usr/bin/at"
+at_path = ""
+
+# Path to the 'mount' executable
+#
+# Ex:
+# mount_path = "/bin/mount"
+mount_path = ""
+
+# After how many minutes should we unmount the decrypted partitions and close
+# them?
+#
+# Ex:
+# unmount_time = "15"
+unmount_time = ""
+
+[Default]
 # Path the encrypted LUKS device.
 #
 # Ex:
@@ -27,6 +47,7 @@ decrypted_device = ""
 mount_point = ""
 
 # After how many minutes should we unmount the decrypted partition and close it?
+# (Optional, will use the global option otherwise).
 #
 # Ex:
 # unmount_time = "15"
