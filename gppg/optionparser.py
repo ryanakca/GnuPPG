@@ -16,15 +16,36 @@
 
 import optparse
 
-parser = optparse.OptionParser(version="Pre-Alpha")
-parser.add_option("-c", "--create", action="store_true", default=False)
+def print_copyright(option, opt, value, parser):
+    pass
+
+
+usage = "Usage: %prog [command] [options]"
+description = \
+"""
+[command] may be 'create', 'mount' or 'unmount' and defaults to 'mount'.
+GnuPPG  Copyright (C) 2009 Ryan Kavanagh <ryanakca@kubuntu.org>\n
+This program comes with ABSOLUTELY NO WARRANTY. This is free\n
+software, and you are welcome to redistribute it under certain\n 
+conditions; type `%prog --copyright' for details.\n
+"""
+
+parser = optparse.OptionParser(version="Pre-Alpha", usage=usage,
+        description=description)
+parser.add_option("-c", "--config", help="Path to configuration file")
+parser.add_option("--copyright", help="Copyright and license information",
+        action="callback", callback=print_copyright)
 create_group = optparse.OptionGroup(parser, "Create options", 
 description="Options for creating a GnuPPG encrypted device.")
-create_group.add_option("-l", "--lvm", action="store_true", default=False)
-create_group.add_option("-L", "--size")
-create_group.add_option("-f", "--fstype")
+create_group.add_option("-l", "--lvm", action="store_true", default=False,
+        help="Create an LVM partition")
+create_group.add_option("-L", "--size", help="Size of the LVM partition. "
+        "[Default: %default]")
+create_group.add_option("-f", "--fstype", help="Filesystem type, must be one "
+        "of /bin/mkfs.* . [Default: %default]")
 create_group.add_option("-n", "--lvname", help="Name of the LVM logical "
-   "volume.")
+        "volume. [Default: %default]")
+create_group.add_option("-v", "--vgname", help="Name of the LVM volume "
+        "group. [Required with LVM]")
 parser.add_option_group(create_group)
-parser.add_option("-m", "--mount", action="store_true", dest="mount", default=True)
-parser.add_option("-u", "--unmount", action="store_false", dest="mount", default=False)
+parser.set_defaults(size="32M", fstype="ext2", lvname="gppg-encrypted")
