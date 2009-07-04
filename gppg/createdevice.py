@@ -17,6 +17,7 @@
 import subprocess
 
 import gppg.configparser
+import gppg.mounter
 
 def run_cryptsetup(command, device, *args):
     """ Will run 'cryptsetup args command device', passing args to cryptsetup.
@@ -49,8 +50,26 @@ def run_format(fstype, device, *args):
     if retcode < 0:
         raise subprocess.CalledProcessError(s, ' '.join(cargs))
 
+def create_lv(vgname, lvname, size, *args):
+    # We may want to support extends down the road.
+    SIZE_UNITS = 'kKmMgGtT'
+    EXTENTS_UNITS = ['%VG', '%FREE']
+    cargs = ['lvcreate', '-n %(lvname)' % {'lvname':lvname}]
+    for arg in args:
+        cargs.append(arg)
+    if size[-1:] in SIZE_UNITS:
+        cargs += ['-l %(size)' % {'size':size}]
+        cargs += [vgname]
+    elif (size[-3:] or size[-5:]) in EXTENTS_UNITS:
+        cargs += ['-L %(size)' % {'size':size}]
+        cargs += [vgname]
+    else:
+        raise ValueError("Invalid size %s, unit must be one of kKmMgGtT, %VG "
+            "or %FREE." % size)
+
+
 def create(device='', lvm=False, vgname='', lvname='', size='', fstype='',
-        homedir='', cryptsetup_args=(), mkfs_args=())
+        homedir='', config='', cryptsetup_args='', mkfs_args='')
     """ Will create the GnuPPG device.
     If not using LVM, device is a block device.
     If using LVM, lvm will be True. We require:
@@ -65,3 +84,19 @@ def create(device='', lvm=False, vgname='', lvname='', size='', fstype='',
         mkfs_args: extra mkfs arguments
     """
 
+    assert fstype, "Please provide a filesystem type"
+    assert homedir, "Please provide a path to a GnuPG homedir"
+    assert config, "Please provide a path to a GnuPPG configuration file"
+
+    if (device && lvm) || ((len(device) == 0) && (lvm == False)):
+        raise ValueError("Please provide either device or a True value to lvm")
+    
+    if device:
+        run_cryptsetup(luksFormat, device, '-y' + cryptsetup_args)
+        gppg.mounter.cryptopen(device)
+        run_format(fstype, device, mkfs_args)
+    else:
+        create_lv(vgname, lvname, size, cryptsetup_args)
+        lv =  '/dev/mapper/%(vgname)s-%(lvname)s' % {'vgname': vgname, 'lvname': lvname}
+        run_cryptsetup('luksFormat', lv, cryptsetup_args)
+        run_format(fstype, lv, mkfs_args)
