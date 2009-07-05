@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import subprocess
+import shutil
 
 from gppg.configparser import GppgHomedir
 from gppg.mounter import cryptopen
@@ -38,9 +39,9 @@ def create_lv(vgname, lvname, size, *args):
             "or %FREE." % size)
 
 
-def create(name, decrypted_name, config_file, device='', lvm=False, vgname='',
-        lvname='', size='', fstype='', homedir='', cryptsetup_args=[],
-        mkfs_args=''):
+def create(name, decrypted_name, mount_point, config_file, unmount_time='',
+        device='', lvm=False, vgname='', lvname='', size='', fstype='',
+        homedir='', cryptsetup_args=[], mkfs_args=''):
     """ Will create the GnuPPG device.
     If not using LVM, device is a block device.
     If using LVM, lvm will be True. We require:
@@ -63,12 +64,17 @@ def create(name, decrypted_name, config_file, device='', lvm=False, vgname='',
         raise ValueError("Please provide either device or a True value to lvm")
 
     homedir = GppgHomedir(section=name, config=config_file)
-    homedir.config.add_section(homedir.section)
-    homedir.config.set(homedir.section, 'decrypted_name', decrypted_name)
+    try:
+        homedir.config.set(homedir.section, 'decrypted_name', decrypted_name)
+    except ConfigParser.NoSectionError:
+        homedir.config.add_section(homedir.section)
+        homedir.config.set(homedir.section, 'decrypted_name', decrypted_name 
 
     if device:
+        # We want to ask for the passphrase twice.
         run_cryptsetup('luksFormat', ['-y'] + cryptsetup_args, device)
         homedir.config.set(homedir.section, 'encrypted_device', device)
+        # Do we need the next line?
         cryptopen(homedir)
         run_mkfs(fstype, '/dev/mapper/%s' % decrypted_name, mkfs_args)
     else:
@@ -78,5 +84,13 @@ def create(name, decrypted_name, config_file, device='', lvm=False, vgname='',
         homedir.config.set(homedir.section, 'encrypted_device', lv)
         cryptopen(homedir)
         run_mkfs(fstype, '/dev/mapper/%s' % decrypted_name, mkfs_args)
+
+    run_mount('/dev/mapper/%s' % decrypted_name, mount_point)
+    shutil.copytree(homedir, os.path.join(mount_point, '.gnupg')
+    os.symlink(os.path.join(mount_point, '.gnupg'), homedir)
+
+    homedir.config.set(homedir.section, 'mount_point', mount_point)
+    if unmount_time:
+        homedir.config.set(homedir.section, 'unmount_time', unmount_time)
 
     return homedir
