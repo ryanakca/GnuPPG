@@ -42,9 +42,9 @@ encrypted_device = ""
 # LUKS device, we'll get /dev/mapper/decrypted_device
 #
 # Default:
-# decrypted_device = "gpg-decrypted"
+# decrypted_name = "gpg-decrypted"
 #
-# decrypted_device = ""
+# decrypted_name = ""
 
 # (Optional) Where should we mount the decrypted partition
 #

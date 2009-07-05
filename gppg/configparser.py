@@ -25,7 +25,7 @@ class GppgConfig(object):
             config_file=os.path.expanduser('~/.gppgrc')):
         defaults = {'gpg_path':'/usr/bin/gpg', 'at_path':'/usr/bin/at',
                 'mount_path':'/bin/mount', 'unmount_time':15,
-                'decrypted_device':'gpg-decrypted', 'mount_point':'/media/gppg'}
+                'decrypted_name':'gpg-decrypted', 'mount_point':'/media/gppg'}
         self.config = ConfigParser.RawConfigParser(defaults)
         self.config.read(config_file)
         self.gpg_path = self.config.get('Global', 'gpg_path')
@@ -50,5 +50,5 @@ class GppgHomedir(GppgConfig):
         if self.config.has_option(section, 'unmount_time'):
             self.unmount_time = self.config.get(section, 'unmount_time')
         self.encrypted_device = self.config.get(section, 'encrypted_device')
-        self.decrypted_device = self.config.get(section, 'decrypted_device')
+        self.decrypted_name = self.config.get(section, 'decrypted_name')
         self.mount_point = self.config.get(section, 'mount_point')

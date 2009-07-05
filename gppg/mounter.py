@@ -20,7 +20,7 @@ from gppg.utils import run_cryptsetup
 def cryptopen(GppgHomedir):
     """ Decrypts a GppgHomedir. """
     run_cryptsetup('luksOpen', GppgHomedir.encrypted_device,
-            GppgHomedir.decrypted_device)
+            GppgHomedir.decrypted_name)
 
 def mount(GppgHomedir):
     """ Mounts a GppgHomedir. """
