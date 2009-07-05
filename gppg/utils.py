@@ -48,3 +48,15 @@ def run_mkfs(fstype, device, *args):
     s = subprocess.call(cargs)
     if retcode < 0:
         raise subprocess.CalledProcessError(s, ' '.join(cargs))
+
+def run_mount(device, dir, *args)
+    """ Will run 'mount args device dir'. """
+    
+    cargs = ['mount']
+    for arg in args:
+        cargs.append(arg)
+    cargs += [device, dir]
+
+    s = subprocess.call(cargs)
+    if retcode < 0:
+        raise subprocess.CalledProcessError(s, ' '.join(cargs))
