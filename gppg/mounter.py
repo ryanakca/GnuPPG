@@ -14,14 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os.path
+
 from gppg.configparser import GppgConfig, GppgHomedir
-from gppg.utils import run_cryptsetup
+from gppg.utils import run_cryptsetup, run_mount
 
-def cryptopen(GppgHomedir):
+def cryptopen(GppgHdir):
     """ Decrypts a GppgHomedir. """
-    run_cryptsetup('luksOpen', GppgHomedir.encrypted_device,
-            GppgHomedir.decrypted_name)
+    run_cryptsetup('luksOpen', GppgHd.encrypted_device,
+            GppgHd.decrypted_name)
 
-def mount(GppgHomedir):
-    """ Mounts a GppgHomedir. """
-    pass
+# def mount_device():
+#     """ Mounts a GppgHomedir. """
+#     assert GppgHd.encrypted_device, "Please set the GppgHomedir's " +
+#         "encrypted_device"
+#     assert GppgHd.decrypted_name, "Please set the GppgHomedir's " +
+#         "decrypted_name"
+#     assert GppgHd.mount_point
+#
+#     if os.path.exists(GppgHd
+#         raise ValueError
+#     run_mount(GppgHomedir.
