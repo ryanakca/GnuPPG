@@ -26,6 +26,7 @@ class GppgConfig(object):
         defaults = {'gpg_path':'/usr/bin/gpg', 'at_path':'/usr/bin/at',
                 'mount_path':'/bin/mount', 'unmount_time':15,
                 'decrypted_name':'gpg-decrypted', 'mount_point':'/media/gppg'}
+        self.config_file = config_file
         self.config = ConfigParser.RawConfigParser(defaults)
         self.config.read(config_file)
         self.gpg_path = self.config.get('Global', 'gpg_path')
@@ -42,6 +43,7 @@ class GppgHomedir(GppgConfig):
     def __init__(self, section='Default', 
             config_file=os.path.expanduser('~/.gppgrc')):
         super(GppgHomedir, self).__init__(config_file=config_file)
+        self.section = section
 
     def read(self):
         # If the self.unmount_time lines are unclear, what we're doing is checking
@@ -56,6 +58,6 @@ class GppgHomedir(GppgConfig):
     def save(self):
         # config_file: user supplied, config: temporary object, self.config: our
         # config object.
-        with open(config_file, 'wb') as config:
+        with open(self.config_file, 'wb') as config:
             self.config.write(config)
 
