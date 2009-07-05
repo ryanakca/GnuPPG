@@ -38,9 +38,9 @@ def create_lv(vgname, lvname, size, *args):
             "or %FREE." % size)
 
 
-def create(name, config_file, device='', lvm=False, vgname='', lvname='', 
-        size='', fstype='', homedir='', config='', cryptsetup_args=[],
-        mkfs_args='')
+def create(name, decrypted_name, config_file, device='', lvm=False, vgname='',
+        lvname='', size='', fstype='', homedir='', cryptsetup_args=[],
+        mkfs_args=''):
     """ Will create the GnuPPG device.
     If not using LVM, device is a block device.
     If using LVM, lvm will be True. We require:
@@ -63,14 +63,20 @@ def create(name, config_file, device='', lvm=False, vgname='', lvname='',
         raise ValueError("Please provide either device or a True value to lvm")
 
     homedir = GppgHomedir(section=name, config=config_file)
+    homedir.config.add_section(homedir.section)
+    homedir.config.set(homedir.section, 'decrypted_name', decrypted_name)
 
     if device:
         run_cryptsetup('luksFormat', ['-y'] + cryptsetup_args, device)
-        cryptopen(device)
-        run_mkfs(fstype, device, mkfs_args)
+        homedir.config.set(homedir.section, 'encrypted_device', device)
+        cryptopen(homedir)
+        run_mkfs(fstype, '/dev/mapper/%s' % decrypted_name, mkfs_args)
     else:
         create_lv(vgname, lvname, size, ['-y'] + cryptsetup_args)
         lv =  '/dev/mapper/%(vgname)s-%(lvname)s' % {'vgname': vgname, 'lvname': lvname}
         run_cryptsetup('luksFormat', ['-y'] + cryptsetup_args, lv)
-        gppg.mounter.cryptopen(lv)
-        run_mkfs(fstype, lv, mkfs_args)
+        homedir.config.set(homedir.section, 'encrypted_device', lv)
+        cryptopen(homedir)
+        run_mkfs(fstype, '/dev/mapper/%s' % decrypted_name, mkfs_args)
+
+    return homedir
