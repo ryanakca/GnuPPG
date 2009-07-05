@@ -52,3 +52,10 @@ class GppgHomedir(GppgConfig):
         self.encrypted_device = self.config.get(section, 'encrypted_device')
         self.decrypted_name = self.config.get(section, 'decrypted_name')
         self.mount_point = self.config.get(section, 'mount_point')
+
+    def save(self):
+        # config_file: user supplied, config: temporary object, self.config: our
+        # config object.
+        with open(config_file, 'wb') as config:
+            self.config.write(config)
+
