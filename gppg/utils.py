@@ -17,7 +17,7 @@
 import subprocess
 
 def run_cryptsetup(action, options=[], *args):
-    """ Will run 'cryptsetup args command device', passing args to cryptsetup.
+    """ Will run 'cryptsetup options action args', passing args to cryptsetup.
 
     Can raise either a suprocess.CalledProcessError or an OSError.
     """
