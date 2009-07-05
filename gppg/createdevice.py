@@ -16,39 +16,9 @@
 
 import subprocess
 
-import gppg.configparser
-import gppg.mounter
-
-def run_cryptsetup(command, device, *args):
-    """ Will run 'cryptsetup args command device', passing args to cryptsetup.
-
-    Can raise either a suprocess.CalledProcessError or an OSError.
-    """
-
-    cargs = ['crypsetup']
-    for arg in args:
-        cargs.append(arg)
-    cargs += [command, device]
-
-    s = subprocess.call(cargs)
-    if retcode < 0:
-        raise subprocess.CalledProcessError(s, ' '.join(cargs))
-
-
-def run_format(fstype, device, *args):
-    """ Will format device using '/sbin/mkfs.fstype *args device'.
-    
-    Can raise either a suprocess.CalledProcessError or an OSError.
-    """
-
-    cargs = ['mkfs.' + fstype]
-    for arg in args:
-        cargs.append(arg)
-    cargs.append(device)
-
-    s = subprocess.call(cargs)
-    if retcode < 0:
-        raise subprocess.CalledProcessError(s, ' '.join(cargs))
+from gppg.configparser import GppgHomedir
+from gppg.mounter import cryptopen
+from gppg.utils import run_cryptsetup, run_mkfs
 
 def create_lv(vgname, lvname, size, *args):
     # We may want to support extends down the road.
@@ -68,8 +38,9 @@ def create_lv(vgname, lvname, size, *args):
             "or %FREE." % size)
 
 
-def create(device='', lvm=False, vgname='', lvname='', size='', fstype='',
-        homedir='', config='', cryptsetup_args='', mkfs_args='')
+def create(name, config_file, device='', lvm=False, vgname='', lvname='', 
+        size='', fstype='', homedir='', config='', cryptsetup_args=[],
+        mkfs_args='')
     """ Will create the GnuPPG device.
     If not using LVM, device is a block device.
     If using LVM, lvm will be True. We require:
@@ -90,13 +61,16 @@ def create(device='', lvm=False, vgname='', lvname='', size='', fstype='',
 
     if (device && lvm) || ((len(device) == 0) && (lvm == False)):
         raise ValueError("Please provide either device or a True value to lvm")
-    
+
+    homedir = GppgHomedir(section=name, config=config_file)
+
     if device:
-        run_cryptsetup(luksFormat, device, '-y' + cryptsetup_args)
-        gppg.mounter.cryptopen(device)
-        run_format(fstype, device, mkfs_args)
+        run_cryptsetup('luksFormat', ['-y'] + cryptsetup_args, device)
+        cryptopen(device)
+        run_mkfs(fstype, device, mkfs_args)
     else:
-        create_lv(vgname, lvname, size, cryptsetup_args)
+        create_lv(vgname, lvname, size, ['-y'] + cryptsetup_args)
         lv =  '/dev/mapper/%(vgname)s-%(lvname)s' % {'vgname': vgname, 'lvname': lvname}
-        run_cryptsetup('luksFormat', lv, cryptsetup_args)
-        run_format(fstype, lv, mkfs_args)
+        run_cryptsetup('luksFormat', ['-y'] + cryptsetup_args, lv)
+        gppg.mounter.cryptopen(lv)
+        run_mkfs(fstype, lv, mkfs_args)
