@@ -42,6 +42,8 @@ class GppgHomedir(GppgConfig):
     def __init__(self, section='Default', 
             config_file=os.path.expanduser('~/.gppgrc')):
         super(GppgHomedir, self).__init__(config_file=config_file)
+
+    def read(self):
         # If the self.unmount_time lines are unclear, what we're doing is checking
         # if "unmount_time" was defined in 'section', if not, we'll check if it
         # was defined in "Global", if not, we'll set it to our default.
