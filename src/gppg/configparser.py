@@ -58,6 +58,5 @@ class GppgHomedir(GppgConfig):
     def save(self):
         # config_file: user supplied, config: temporary object, self.config: our
         # config object.
-        with open(self.config_file, 'wb') as config:
-            self.config.write(config)
+        self.config.write(open(self.config_file, 'wb'))
 

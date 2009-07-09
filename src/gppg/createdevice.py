@@ -60,7 +60,7 @@ def create(name, decrypted_name, mount_point, config_file, unmount_time='',
     assert homedir, "Please provide a path to a GnuPG homedir"
     assert config, "Please provide a path to a GnuPPG configuration file"
 
-    if (device && lvm) || ((len(device) == 0) && (lvm == False)):
+    if (device and lvm) or (not device and (lvm == False)):
         raise ValueError("Please provide either device or a True value to lvm")
 
     homedir = GppgHomedir(section=name, config=config_file)
@@ -68,7 +68,7 @@ def create(name, decrypted_name, mount_point, config_file, unmount_time='',
         homedir.config.set(homedir.section, 'decrypted_name', decrypted_name)
     except ConfigParser.NoSectionError:
         homedir.config.add_section(homedir.section)
-        homedir.config.set(homedir.section, 'decrypted_name', decrypted_name 
+        homedir.config.set(homedir.section, 'decrypted_name', decrypted_name)
 
     if device:
         # We want to ask for the passphrase twice.
@@ -86,7 +86,7 @@ def create(name, decrypted_name, mount_point, config_file, unmount_time='',
         run_mkfs(fstype, '/dev/mapper/%s' % decrypted_name, mkfs_args)
 
     run_mount('/dev/mapper/%s' % decrypted_name, mount_point)
-    shutil.copytree(homedir, os.path.join(mount_point, '.gnupg')
+    shutil.copytree(homedir, os.path.join(mount_point, '.gnupg'))
     os.symlink(os.path.join(mount_point, '.gnupg'), homedir)
 
     homedir.config.set(homedir.section, 'mount_point', mount_point)
