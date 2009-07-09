@@ -37,6 +37,10 @@ def create_lv(vgname, lvname, size, *args):
     else:
         raise ValueError("Invalid size %s, unit must be one of kKmMgGtT, %VG "
             "or %FREE." % size)
+    retcode = subprocess.call(cargs)
+    if retcode < 0:
+        raise ValueError("%s was killed by signal %d" % (' '.join(cargs),
+            retcode))
 
 
 def create(name, decrypted_name, mount_point, config_file, unmount_time='',

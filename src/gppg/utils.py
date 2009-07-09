@@ -29,9 +29,9 @@ def run_cryptsetup(action, options=[], *args):
     for arg in args:
         cargs.append(arg)
 
-    s = subprocess.call(cargs)
+    retcode = subprocess.call(cargs)
     if retcode < 0:
-        raise subprocess.CalledProcessError(s, ' '.join(cargs))
+        raise subprocess.CalledProcessError(retcode, ' '.join(cargs))
 
 
 def run_mkfs(fstype, device, *args):
@@ -45,9 +45,9 @@ def run_mkfs(fstype, device, *args):
         cargs.append(arg)
     cargs.append(device)
 
-    s = subprocess.call(cargs)
+    retcode = subprocess.call(cargs)
     if retcode < 0:
-        raise subprocess.CalledProcessError(s, ' '.join(cargs))
+        raise subprocess.CalledProcessError(retcode, ' '.join(cargs))
 
 def run_mount(device, dir, *args):
     """ Will run 'mount args device dir'. """
@@ -57,6 +57,6 @@ def run_mount(device, dir, *args):
         cargs.append(arg)
     cargs += [device, dir]
 
-    s = subprocess.call(cargs)
+    retcode = subprocess.call(cargs)
     if retcode < 0:
-        raise subprocess.CalledProcessError(s, ' '.join(cargs))
+        raise subprocess.CalledProcessError(retcode, ' '.join(cargs))
